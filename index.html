@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Create free, permanent static QR codes that never expire. No sign-ups, no redirects, and 100% client-side privacy. Download high-quality SVG & PNG instantly.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Static QR Code Generator | No Sign-up & No Expiration</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom transitions for smoother UI */
+        .transition-all-300 { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                </svg>
+                <span class="font-bold text-xl tracking-tight">StaticQR<span class="text-blue-600">Gen</span></span>
+            </div>
+            <div class="text-xs font-medium bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                100% Client-Side • Private
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-10">
+        
+        <div class="text-center max-w-3xl mx-auto mb-10">
+            <h1 class="text-4xl font-bold text-slate-900 mb-3">Static QR Code Generator</h1>
+            <p class="text-lg text-slate-600">
+                No Sign-up. No Expiration. 100% Free & Private.
+            </p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-5xl mx-auto flex flex-col md:flex-row border border-slate-200">
+            
+            <div class="w-full md:w-1/2 p-8 bg-white flex flex-col gap-6 border-b md:border-b-0 md:border-r border-slate-100">
+                
+                <div>
+                    <label for="qr-text" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Enter Content (URL or Text)
+                    </label>
+                    <textarea 
+                        id="qr-text" 
+                        rows="4" 
+                        placeholder="https://example.com"
+                        class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all-300 resize-none text-slate-700"
+                    ></textarea>
+                    <p class="text-xs text-slate-400 mt-1">Your data never leaves your browser.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Foreground Color</label>
+                        <div class="flex items-center gap-2 border border-slate-300 p-2 rounded-lg">
+                            <input type="color" id="color-dark" value="#000000" class="h-8 w-8 border-none bg-transparent cursor-pointer">
+                            <span id="hex-dark" class="text-xs font-mono text-slate-500">#000000</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Background Color</label>
+                        <div class="flex items-center gap-2 border border-slate-300 p-2 rounded-lg">
+                            <input type="color" id="color-light" value="#ffffff" class="h-8 w-8 border-none bg-transparent cursor-pointer">
+                            <span id="hex-light" class="text-xs font-mono text-slate-500">#ffffff</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="w-full md:w-1/2 p-8 bg-slate-50 flex flex-col items-center justify-center text-center">
+                
+                <h2 class="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Live Preview</h2>
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex items-center justify-center w-64 h-64 relative">
+                    <canvas id="qr-canvas" class="max-w-full max-h-full"></canvas>
+                    <div id="empty-state" class="absolute inset-0 flex items-center justify-center text-slate-300">
+                        <span class="text-sm">Enter text to generate</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 w-full max-w-xs">
+                    <button id="btn-png" disabled class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg shadow transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+                        <span>Download PNG</span>
+                    </button>
+                    <button id="btn-svg" disabled class="flex-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium py-2.5 px-4 rounded-lg shadow-sm transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+                        <span>Download SVG</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
+            <p>&copy; <span id="year"></span> Static QR Code Generator. Open Source & Client-Side.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // DOM Elements
+        const textInput = document.getElementById('qr-text');
+        const colorDarkInput = document.getElementById('color-dark');
+        const colorLightInput = document.getElementById('color-light');
+        const hexDark = document.getElementById('hex-dark');
+        const hexLight = document.getElementById('hex-light');
+        const canvas = document.getElementById('qr-canvas');
+        const emptyState = document.getElementById('empty-state');
+        const btnPng = document.getElementById('btn-png');
+        const btnSvg = document.getElementById('btn-svg');
+
+        // State
+        let qrData = '';
+        let colorDark = '#000000';
+        let colorLight = '#ffffff';
+
+        // Initialize
+        function init() {
+            addEventListeners();
+        }
+
+        function addEventListeners() {
+            // Text Input Listener
+            textInput.addEventListener('input', (e) => {
+                qrData = e.target.value.trim();
+                updateQR();
+            });
+
+            // Color Inputs
+            colorDarkInput.addEventListener('input', (e) => {
+                colorDark = e.target.value;
+                hexDark.textContent = colorDark;
+                updateQR();
+            });
+
+            colorLightInput.addEventListener('input', (e) => {
+                colorLight = e.target.value;
+                hexLight.textContent = colorLight;
+                updateQR();
+            });
+
+            // Download Actions
+            btnPng.addEventListener('click', downloadPNG);
+            btnSvg.addEventListener('click', downloadSVG);
+        }
+
+        // Core Generation Function
+        function updateQR() {
+            if (!qrData) {
+                // Show empty state if text is gone
+                canvas.style.display = 'none';
+                emptyState.style.display = 'flex';
+                btnPng.disabled = true;
+                btnSvg.disabled = true;
+                return;
+            }
+
+            // Hide empty state
+            canvas.style.display = 'block';
+            emptyState.style.display = 'none';
+            btnPng.disabled = false;
+            btnSvg.disabled = false;
+
+            // Generate Canvas for Preview
+            // We use the global QRCode object from the library
+            QRCode.toCanvas(canvas, qrData, {
+                width: 400, // Render size for preview
+                margin: 2,
+                color: {
+                    dark: colorDark,
+                    light: colorLight
+                },
+                errorCorrectionLevel: 'M'
+            }, function (error) {
+                if (error) console.error(error);
+            });
+        }
+
+        // Download PNG Logic (High Res)
+        function downloadPNG() {
+            if (!qrData) return;
+
+            // Create a temporary hidden canvas for high-res export
+            const tempCanvas = document.createElement('canvas');
+            
+            QRCode.toCanvas(tempCanvas, qrData, {
+                width: 1000, // High Resolution width
+                margin: 2,
+                color: {
+                    dark: colorDark,
+                    light: colorLight
+                },
+                errorCorrectionLevel: 'H' // High error correction for print
+            }, function (error) {
+                if (error) {
+                    console.error(error);
+                    return;
+                }
+                
+                // Trigger Download
+                const link = document.createElement('a');
+                link.download = `qrcode-${Date.now()}.png`;
+                link.href = tempCanvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+
+        // Download SVG Logic (Vector)
+        function downloadSVG() {
+            if (!qrData) return;
+
+            QRCode.toString(qrData, {
+                type: 'svg',
+                margin: 2,
+                color: {
+                    dark: colorDark,
+                    light: colorLight
+                }
+            }, function (error, svgString) {
+                if (error) {
+                    console.error(error);
+                    return;
+                }
+
+                // Create a Blob from the SVG string
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+
+                // Trigger Download
+                const link = document.createElement('a');
+                link.download = `qrcode-${Date.now()}.svg`;
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Cleanup
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Run
+        init();
+
+    </script>
+</body>
+</html>
